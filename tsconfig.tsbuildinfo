@@ -1,1 +1,0 @@
-{"root":["./src/main.ts","./src/router.ts","./src/vite-env.d.ts","./src/lib/utils.ts","./src/mock/trace.ts","./src/app.vue","./src/pages/notfound.vue","./src/pages/trace.vue"],"version":"5.6.3"}
