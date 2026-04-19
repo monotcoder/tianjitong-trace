@@ -11,6 +11,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./pages/NotFound.vue'),
   },
   {
+    path: '/label/:code',
+    name: 'label',
+    component: () => import('./pages/Label.vue'),
+    props: true,
+  },
+  {
     path: '/:traceCode',
     name: 'trace',
     component: () => import('./pages/Trace.vue'),

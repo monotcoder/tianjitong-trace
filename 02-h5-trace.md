@@ -11,9 +11,12 @@
 
 ```
 trace.tianjitong.com
-├── /:traceCode （追溯详情页，核心页面）
-└── /404 （未找到页面）
+├── /:traceCode      （追溯详情页 —— 批次级，核心页面）
+├── /label/:code     （电子标签落地页 —— SKU 级扫码介绍，新增）
+└── /404             （未找到页面）
 ```
+
+> 两条路径互补：`/:traceCode` 展示某**批次**的追溯链路；`/label/:code` 展示某 **SKU** 的产品介绍（承诺 / 检测 / 营销 / 自定义）。路由定义时 `/label/:code` 必须在 `/:traceCode` 捕获全路径之前。
 
 ---
 
@@ -213,6 +216,32 @@ trace.tianjitong.com/:traceCode
 
 - 日志数据在租户后台"扫码记录"中可查看
 - 不对消费者展示扫码统计
+
+---
+
+## 七bis、电子标签落地页 `/label/:code`（新增）
+
+SKU 级扫码落地页，消费者扫外包装上的电子标签二维码进入。不依赖批次。
+
+### 数据来源
+- `GET /api/label/public/:code` — 公开接口，返回 `{sku, content, tenantName, ...}`，content 是 JSON 字符串
+- 若 sku 有 `categoryTemplate`，再请求 `GET /api/category-template/:key` 拿字段定义（label + type + key）
+
+### 渲染结构（按 `content.order` 排序）
+1. **关键承诺卡片**（emerald 绿色强调块，置顶）
+   - 承诺字段逐条渲染：truthy 显示 ✓ + 正常文字；falsy 显示 — + 删除线
+2. **检测报告 / 附件**
+   - 字段值按空白/`,、\n` 拆分为 URL 列表；图片 URL 走缩略图网格，其他链接走文件 chip
+3. **营销内容**
+   - `richtext` 用 `<p class="whitespace-pre-wrap">` 渲染；`multiimage` 走缩略图网格
+4. **自定义卡片**
+   - 由编辑器新增的 `{title, body}` 数组，按写入顺序展示
+
+`content.order` 由管理后台拖拽保存，落地页严格遵守该顺序。
+
+### 状态
+- `status=draft` 的标签 `/api/label/public/:code` 返回 404
+- 不再依赖批次状态警告（批次下架警告仅作用于 `/:traceCode`）
 
 ---
 
